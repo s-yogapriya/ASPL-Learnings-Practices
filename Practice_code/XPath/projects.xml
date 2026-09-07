@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="projects.xsl"?>
+
+<projects>
+    <project>
+        <name>Website Development</name>
+        <language>HTML</language>
+    </project>
+
+    <project>
+        <name>Mobile Application</name>
+        <language>Java</language>
+    </project>
+</projects>
