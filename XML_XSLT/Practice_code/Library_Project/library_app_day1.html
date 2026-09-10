@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Digital Library Automation Lab</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 40px; background-color: #f5f7fa; color: #333; }
+        h1 { color: #2c3e50; margin-bottom: 5px; }
+        .subtitle { color: #7f8c8d; margin-bottom: 25px; font-size: 14px; }
+        table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 5px rgba(0,0,0,0.05); border-radius: 6px; overflow: hidden; }
+        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #e1e8ed; }
+        th { background-color: #34495e; color: white; font-weight: 600; }
+        tr:hover { background-color: #f8f9fa; }
+        .badge { background: #e74c3c; color: white; padding: 3px 7px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 8px; }
+        .status-available { color: #27ae60; font-weight: bold; }
+        .status-borrowed { color: #c0392b; font-style: italic; }
+        .summary-box { margin-top: 30px; padding: 20px; background: #eaedf1; border-left: 5px solid #34495e; border-radius: 4px; }
+    </style>
+</head>
+<body>
+
+    <h1>📚 Central Library Dashboard</h1>
+    <div class="subtitle">XML Data Parsed &amp; Transformed via Modern W3C DOM APIs (No Deprecated Engines)</div>
+
+    <!-- The table container where data will be generated -->
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Category</th>
+                <th>Pages</th>
+                <th>Price</th>
+                <th>Status</th>
+                <th>Partner Code</th>
+            </tr>
+        </thead>
+        <tbody id="library-table-body">
+            <!-- Data rows will be injected here -->
+        </tbody>
+    </table>
+
+    <!-- Summary Template Container -->
+    <div id="library-summary"></div>
+
+    <script>
+        // 1. LEARN XML SYNTAX, ELEMENTS, ATTRIBUTES & NAMESPACES
+        // This is your raw XML database stored as a string constant
+        const xmlDatabase = `
+        <library xmlns:partner="http://example.com">
+            <book id="B01" status="available">
+                <title>Dune</title>
+                <author>Frank Herbert</author>
+                <category>Science Fiction</category>
+                <pages>617</pages>
+                <price currency="USD">14.99</price>
+                <partner:storeCode>SF-991</partner:storeCode>
+            </book>
+            <book id="B02" status="borrowed">
+                <title>The Hobbit</title>
+                <author>J.R.R. Tolkien</author>
+                <category>Fantasy</category>
+                <pages>310</pages>
+                <price currency="USD">9.99</price>
+                <partner:storeCode>FN-442</partner:storeCode>
+            </book>
+            <book id="B03" status="available">
+                <title>Neuromancer</title>
+                <author>William Gibson</author>
+                <category>Science Fiction</category>
+                <pages>271</pages>
+                <price currency="USD">11.50</price>
+                <partner:storeCode>SF-102</partner:storeCode>
+            </book>
+            <book id="B04" status="available">
+                <title>And Then There Were None</title>
+                <author>Agatha Christie</author>
+                <category>Mystery</category>
+                <pages>272</pages>
+                <price currency="USD">8.99</price>
+                <partner:storeCode>MY-301</partner:storeCode>
+            </book>
+             <book id="B04" status="">
+                <title>And Then There Were None</title>
+                <author>Agatha Christie</author>
+                <category>Mystery</category>
+                <pages>272</pages>
+                <price currency="USD">8.99</price>
+                <partner:storeCode>MY-301</partner:storeCode>
+            </book>
+        </library>
+        `;
+
+        // 2. VALIDATING & PARSING THE XML DOCUMENT
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlDatabase, "application/xml");
+
+        // Check for XML syntax parsing errors
+        const parseError = xmlDoc.getElementsByTagName("parsererror");
+        if (parseError.length > 0) {
+            document.body.innerHTML = `<h3 style="color:red;">XML Syntax Error: ${parseError[0].textContent}</h3>`;
+        } else {
+            transformXmlData(xmlDoc);
+        }
+
+        // 3. THE TRANSFORMATION ENGINE (Simulating XSLT logic)
+        function transformXmlData(xml) {
+            // XPath Selection Equivalent: selecting all <book> elements inside <library>
+            // Array.from() converts the returned collection into a normal JavaScript array.
+            const bookElements = Array.from(xml.getElementsByTagName("book"));
+
+            // 4. PRACTICE SORTING (Alphabetically by Category, then by Title)
+            bookElements.sort((bookA, bookB) => {
+                const catA = bookA.getElementsByTagName("category")[0].textContent;
+                const catB = bookB.getElementsByTagName("category")[0].textContent;
+                
+                // Primary Sort: Category
+                if (catA !== catB) {
+                    return catA.localeCompare(catB);
+                }
+                
+                // Secondary Sort: Title
+                const titleA = bookA.getElementsByTagName("title")[0].textContent;
+                const titleB = bookB.getElementsByTagName("title")[0].textContent;
+                return titleA.localeCompare(titleB);
+            });
+
+            const tableBody = document.getElementById("library-table-body");
+            let tableRowsHtml = "";
+
+            // 5. PRACTICE LOOPS (Simulating <xsl:for-each>)
+            bookElements.forEach(book => {
+                // Extracting elements and attributes using core DOM commands (XPath logic)
+                const id = book.getAttribute("id"); 
+                const status = book.getAttribute("status");
+                const title = book.getElementsByTagName("title")[0].textContent;
+                const author = book.getElementsByTagName("author")[0].textContent;
+                const category = book.getElementsByTagName("category")[0].textContent;
+                const pages = parseInt(book.getElementsByTagName("pages")[0].textContent);
+                const priceNode = book.getElementsByTagName("price")[0];
+                const price = priceNode.textContent;
+                const currency = priceNode.getAttribute("currency");
+                
+                // NAMESPACE ELEMENT READING
+                // In standard XML DOM parsing, namespace tags are read using their literal element names
+                const partnerCodeNode = book.getElementsByTagName("partner:storeCode")[0];
+                const partnerCode = partnerCodeNode ? partnerCodeNode.textContent : "N/A";
+
+                // 6. PRACTICE CONDITIONS (Simulating <xsl:if>)
+                let titleBadge = "";
+                if (pages < 300) {
+                    titleBadge = `<span class="badge">Quick Read</span>`;
+                }
+
+                // 7. PRACTICE COMPLEX CONDITIONS (Simulating <xsl:choose>)
+                let statusHtml = "";
+                if (status === "available") {
+                    statusHtml = `<span class="status-available">Available</span>`;
+                } else if (status === "borrowed") {
+                    statusHtml = `<span class="status-borrowed">Checked Out</span>`;
+                } else {
+                    statusHtml = `<span>Unknown</span>`;
+                }
+
+                // Append the constructed row
+                tableRowsHtml += `
+                    <tr>
+                        <td>${id}</td>
+                        <td>${title}${titleBadge}</td>
+                        <td>${author}</td>
+                        <td>${category}</td>
+                        <td>${pages} pages</td>
+                        <td>$${price} (${currency})</td>
+                        <td>${statusHtml}</td>
+                        <td>${partnerCode}</td>
+                    </tr>
+                `;
+            });
+
+            // Inject rows into the table
+            tableBody.innerHTML = tableRowsHtml;
+
+            // 8. MODULAR TEMPLATES (Simulating <xsl:apply-templates>)
+            renderSummaryTemplate(bookElements.length);
+        }
+
+        // Modular Summary Component function
+        function renderSummaryTemplate(totalBooks) {
+            const summaryContainer = document.getElementById("library-summary");
+            summaryContainer.innerHTML = `
+                <div class="summary-box">
+                    <h3>System Verification Details:</h3>
+                    <p>Total book nodes compiled successfully from XML data tree: <strong>${totalBooks} nodes</strong>.</p>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

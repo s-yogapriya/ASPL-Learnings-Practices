@@ -1,0 +1,65 @@
+1. Store XML data in xmlDatabase
+        ↓
+2. Create DOMParser
+        ↓
+3. Parse XML using parseFromString()
+        ↓
+4. Check for parsererror
+        ↓
+5. Call transformXmlData()
+        ↓
+6. Select all <book> nodes
+        ↓
+7. Sort books by category and title
+        ↓
+8. Select the HTML <tbody>
+        ↓
+9. Loop through each book
+        ↓
+10. Read attributes using getAttribute()
+        ↓
+11. Read elements using getElementsByTagName()
+        ↓
+12. Read values using textContent
+        ↓
+13. Process namespace element partner:storeCode
+        ↓
+14. Apply page-count condition
+        ↓
+15. Apply book-status condition
+        ↓
+16. Construct <tr> HTML
+        ↓
+17. Insert rows using innerHTML
+        ↓
+18. Call renderSummaryTemplate()
+        ↓
+19. Display total number of books
+
+
+
+
+Library_Project Flow
+---------------------
+
+library.xml
+     ↓
+fetch("library.xml")
+     ↓
+response.text()
+     ↓
+DOMParser
+     ↓
+XML DOM
+     ↓
+<book> nodes
+     ↓
+JavaScript objects
+     ↓
+┌─────────────┬─────────────┬──────────────┐
+│ Table       │ Cards       │ Categories   │
+└─────────────┴─────────────┴──────────────┘
+     ↓
+Search / Filter / Sort
+     ↓
+Updated UI
